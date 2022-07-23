@@ -30,7 +30,8 @@ namespace eStore.Controllers
                 if (member.Email.ToLower().Equals("admin@fstore.com") && member.Password.Equals("admin@@"))
                 {
                     HttpContext.Session.SetInt32("ID", 1);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home"); 
+
                 }
                 if (loggedInUser != null)
                 {

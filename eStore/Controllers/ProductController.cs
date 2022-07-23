@@ -14,6 +14,7 @@ namespace eStore.Controllers
         IProductRepository productRepository = null;
         public ProductController() => productRepository = new ProductRepository();
 
+
         // GET: ProductController
         public ActionResult Index()
         {
