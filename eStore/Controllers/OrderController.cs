@@ -1,178 +1,104 @@
 ﻿using BusinessObejct.Object;
 using DataAccess.Repository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace eStore.Controllers
-{
-    public class OrderController : Controller
-    {
+namespace eStore.Controllers {
+    public class OrderController : Controller {
         IOrderRepository orderRepository = null;
-        IOrderDetailRepository orderDetailRepository = null;
-        public OrderController()
-        {
-            orderRepository = new OrderRepository();
-            orderDetailRepository = new OrderDetailRepository();
+        
+        public OrderController() => orderRepository = new OrderRepository();
+
+        // GET: ordersController
+        public IActionResult Index() {
+            var orderList = orderRepository.GetOrders();
+            return View(orderList);
         }
 
-        // GET: OrderController
-        public ActionResult Index()
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1) 
-            { 
-                return NotFound(); 
-            }
-
-            var orders = orderRepository.GetOrders();
-            return View(orders);
-        }
-
-        // GET: OrderController/Details/5
-        public ActionResult Details(int? id)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1)
-            {
+        // GET: ordersController/Details/2
+        public IActionResult Details(int? id) {
+            if (id == null) {
                 return NotFound();
             }
-            if (id == null) 
-            { 
-                return NotFound(); 
-            }
             var order = orderRepository.GetOrderByID(id.Value);
-            if (order == null) 
-            { 
-                return NotFound(); 
+            if(order == null) {
+                return NotFound();
             }
+
             return View(order);
         }
 
-        // GET: OrderController/Create
-        public ActionResult Create()
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1) 
-            { 
-                return NotFound(); 
-            }
-            return View();
-        }
-
-        // POST: OrderController/Create
+        // GET: ordersController/Create
+        public IActionResult Create() => View();
+        // POST: ordersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Order order)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1)
-            {
-                return NotFound();
-            }
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    orderRepository.InsertOrder(order);
+        public IActionResult Create(Order order) {
+            try {
+                if(ModelState.IsValid) {
+                    orderRepository.AddOrder(order);
                 }
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 ViewBag.Message = ex.Message;
                 return View(order);
             }
         }
 
-        // GET: OrderController/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1)
-            {
-                return NotFound();
-            }
-
-            if (id == null)
-            {
-                return NotFound();
+        // GET: ordersController/Edit/2
+        public IActionResult Edit(int? id) {
+            if (id == null) {
+                NotFound();
             }
             var order = orderRepository.GetOrderByID(id.Value);
-            if (order == null)
-            {
+            if (order == null) {
                 return NotFound();
             }
+
             return View(order);
         }
-
-        // POST: OrderController/Edit/5
+        // POST: ordersController/Edit/2
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Order order)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1)
-            {
-                return NotFound();
-            }
-            try
-            {
-                if (id != order.OrderId)
-                {
+        public IActionResult Edit(int id, Order order) {
+            try {
+                if (id != order.OrderId) {
                     return NotFound();
                 }
-                if (ModelState.IsValid) 
-                {
+                if(ModelState.IsValid) {
                     orderRepository.UpdateOrder(order);
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 ViewBag.Message = ex.Message;
                 return View();
             }
         }
 
-        // GET: OrderController/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1) 
-            {
-                return NotFound();
-            }
-
-            if (id == null)
-            {
+        // GET: ordersController/Delete/1
+        public IActionResult Delete(int? id) {
+            if(id == null) {
                 return NotFound();
             }
             var order = orderRepository.GetOrderByID(id.Value);
-            if (order == null)
-            {
+            if(order == null) {
                 return NotFound();
             }
+
             return View(order);
         }
-
-        // POST: OrderController/Delete/5
+        // POST: ordersController/Delete/1
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
-        {
-            var adminID = HttpContext.Session.GetInt32("ID");
-            if (adminID != 1) 
-            { 
-                return NotFound(); 
-            }
-            try
-            {
-                orderRepository.DeleteOrder(id);
+        public IActionResult Delete(int id) {
+            try {
+                orderRepository.RemoveOrder(id);
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 ViewBag.Message = ex.Message;
                 return View();
             }

@@ -1,20 +1,13 @@
 ﻿using BusinessObejct.Object;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DataAccess.Repository
-{
-    public interface IOrderDetailRepository
-    {
-        IEnumerable<OrderDetail> GetOrderDetails();
-        IEnumerable<OrderDetail> GetOrderDetailsByOrderID(int orderID);
-        OrderDetail GetOrderDetailByOrderID(int orderID, int productID);
-        IEnumerable<OrderDetail> Search(string searchValue);
-        void InsertOrderDetail(OrderDetail detail);
-        void DeleteOrderDetail(int orderID, int productID);
-        void UpdateOrderDetail(OrderDetail detail);
+namespace DataAccess.Repository {
+    public interface IOrderDetailRepository {
+        public IEnumerable<OrderDetail> GetOrderDetails();
+        public OrderDetail GetOrderDetailByID(int Id);
+        public void AddOrderDetail(OrderDetail oDetail);
+        public void UpdateOrderDetail(OrderDetail oDetail);
+        public void RemoveOrderDetail(int Id);
     }
 }

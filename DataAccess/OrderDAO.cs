@@ -1,153 +1,141 @@
 ﻿using BusinessObejct.Object;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DataAccess
-{
-    public class OrderDAO
-    {
+namespace DataAccess {
+    public class OrderDAO {
         private static OrderDAO instance = null;
-        private static readonly object instanceLock = new object();
-        public static OrderDAO Instance
-        {
-            get
-            {
-                lock (instanceLock)
-                {
-                    if (instance == null) 
-                    { 
-                        instance = new OrderDAO(); 
+        private static readonly object instancelock = new object();
+        
+        private OrderDAO() { }
+
+        public static OrderDAO Instance {
+            get {
+                lock (instancelock) {
+                    if (instance == null) {
+                        instance = new OrderDAO();
                     }
-                    return instance;
                 }
+                return instance;
             }
         }
-        public IEnumerable<Order> GetOrderList()
-        {
-            List<Order> orders = new List<Order>();
-            try
-            {
-                using (var context = new SaleManagementContext())
-                {
-                    orders = context.Orders.ToList();
+
+        public IEnumerable<Order> GetOrderList() {
+            /*IDataReader dataReader = null;
+            string SQLSelect = "SELECT * FROM Order";
+            var orders = new List<Order>();
+
+            try {
+                dataReader = dataProvider.GetDataReader(SQLSelect, CommandType.Text, out connection);
+                while (dataReader.Read()) {
+                    orders.Add(new Order(
+                        dataReader.GetInt32(0),
+                        dataReader.GetInt32(1),
+                        dataReader.GetDateTime(2),
+                        dataReader.GetDateTime(3),
+                        dataReader.GetDateTime(4),
+                        dataReader.GetDecimal(5)
+                    ));
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
+            finally {
+                dataReader.Close();
+                CloseConnection();
+            }
+
+            return orders;*/
+            List<Order> orders;
+
+            try {
+                using SaleManagementContext SaleManagementContext = new SaleManagementContext();
+                orders = SaleManagementContext.Orders.ToList();
+            }
+            catch(Exception ex) {
+                throw new Exception(ex.Message);
+            }
+
             return orders;
         }
 
-        public Order GetOrderByID(int orderID)
-        {
+        public Order GetOrderByID(int orderID) {
             Order order = null;
-            try
-            {
-                using (var context = new SaleManagementContext())
-                {
-                    order = context.Orders.SingleOrDefault(m => m.OrderId == orderID);
+            /*IDataReader dataReader = null;
+            string SQLSelect = "SELECT *\n" +
+                "FROM Order\n" +
+                "WHERE OrderID = @OrderID";
+
+            try {
+                var param = dataProvider.CreateParameter("@OrderID", 4, orderID, DbType.Int32);
+                dataReader = dataProvider.GetDataReader(SQLSelect, CommandType.Text, out connection, param);
+                if (dataReader.Read()) {
+                    order = new Order(
+                        dataReader.GetInt32(0),
+                        dataReader.GetInt32(1),
+                        dataReader.GetDateTime(2),
+                        dataReader.GetDateTime(3),
+                        dataReader.GetDateTime(4),
+                        dataReader.GetDecimal(5)
+                    );
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
+            finally {
+                dataReader.Close();
+                CloseConnection();
+            }
+
+            return order;*/
+
+            try {
+                using SaleManagementContext stock = new SaleManagementContext();
+                order = stock.Orders.SingleOrDefault(o => o.OrderId == orderID);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
+
             return order;
         }
-        public void AddNew(Order order)
-        {
-            try
-            {
-                Order _order = OrderDAO.Instance.GetOrderByID(order.OrderId);
-                if (_order == null)
-                {
-                    using (var context = new SaleManagementContext())
-                    {
-                        context.Orders.Add(order);
-                        context.SaveChanges();
-                    }
-                }
-                else 
-                { 
-                    throw new Exception("The order is already existed!"); 
-                }
+
+        public void Add(Order order) {
+            try {
+                using SaleManagementContext stock = new SaleManagementContext();
+                stock.Orders.Add(order);
+                stock.SaveChanges();
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 throw new Exception(ex.Message);
             }
         }
 
-        public void Update(Order order)
-        {
-            try
-            {
-                Order _order = OrderDAO.Instance.GetOrderByID(order.OrderId);
-                if (_order != null)
-                {
-                    using (var context = new SaleManagementContext())
-                    {
-                        context.Orders.Update(order);
-                        context.SaveChanges();
-                    }
-                }
-                else 
-                { 
-                    throw new Exception("The order does not exist!"); 
-                }
+        public void Update(Order order) { 
+            try {
+                using SaleManagementContext stock = new SaleManagementContext();
+                stock.Entry<Order>(order).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                stock.SaveChanges();
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 throw new Exception(ex.Message);
             }
         }
 
-        public void Remove(int orderId)
-        {
-            try
-            {
-                Order order = OrderDAO.Instance.GetOrderByID(orderId);
-                if (order != null)
-                {
-                    using (var context = new SaleManagementContext())
-                    {
-                        context.Orders.Remove(order);
-                        context.SaveChanges();
-
-                    }
-                }
-                else 
-                { 
-                    throw new Exception("The order does not exist!"); 
-                }
+        public void Remove(int orderID) { 
+            try {
+                using SaleManagementContext stock = new SaleManagementContext();
+                var order = stock.Orders.SingleOrDefault(o => o.OrderId == orderID);
+                stock.Orders.Remove(order);
+                stock.SaveChanges();
             }
-            catch (Exception ex)
-            {
+            catch(Exception ex) {
                 throw new Exception(ex.Message);
             }
-        }
-        public IEnumerable<Order> Search(string searchValue)
-        {
-            var result = new List<Order>();
-            try
-            {
-                using (var context = new SaleManagementContext())
-                {
-                    var Orders = from o in context.Orders
-                                 where o.MemberId.ToString().Contains(searchValue) || o.OrderId.ToString().Contains(searchValue)
-                                 select o;
-                    result = Orders.ToList<Order>();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            return result;
         }
     }
 }

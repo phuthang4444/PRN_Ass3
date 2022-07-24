@@ -1,19 +1,15 @@
 ﻿using BusinessObejct.Object;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DataAccess.Repository
-{
-    public interface IOrderRepository
-    {
-        IEnumerable<Order> GetOrders();
-        Order GetOrderByID(int orderID);
-        void InsertOrder(Order order);
-        void UpdateOrder(Order order);
-        void DeleteOrder(int orderID);
-        IEnumerable<Order> Search(string searchValue);
+namespace DataAccess.Repository {
+    public interface IOrderRepository {
+        public IEnumerable<Order> GetOrders();
+        public Order GetOrderByID(int orderID);
+        public void AddOrder(Order order);
+        public void UpdateOrder(Order order);
+        public void RemoveOrder(int orderID);
+        public Order SearchOrder(int orderID, DateTime orderDate, DateTime? requireDate
+            , DateTime? shippedDate, Decimal freight);
     }
 }
